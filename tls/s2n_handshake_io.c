@@ -330,7 +330,6 @@ static int handshake_read_io(struct s2n_connection *conn)
     return 0;
 }
 
-<<<<<<< HEAD
 /* if we are performing a write, assert that the connection
  * state is consistent with the mode (client or server) */
 void validate_send_state(struct s2n_connection* conn) {
