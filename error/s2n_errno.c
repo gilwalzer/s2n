@@ -18,7 +18,7 @@
 
 #include "error/s2n_errno.h"
 
-#include <s2n.h>
+#include "api/s2n.h"
 
 __thread int s2n_errno;
 __thread const char *s2n_debug_str;

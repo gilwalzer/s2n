@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <s2n.h>
+#include "api/s2n.h"
 
 #define S2N_DEBUG_STR_LEN 128
 extern __thread const char *s2n_debug_str;

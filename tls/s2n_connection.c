@@ -19,7 +19,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <s2n.h>
+#include "api/s2n.h"
 
 #include "error/s2n_errno.h"
 
