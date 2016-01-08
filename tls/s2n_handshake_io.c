@@ -86,6 +86,8 @@ static int s2n_conn_update_handshake_hashes(struct s2n_connection *conn, struct 
  */
 static int handshake_write_io(struct s2n_connection *conn)
 {
+    validate_send_state(conn);
+
     uint8_t record_type = state_machine[conn->handshake.state].record_type;
     s2n_blocked_status blocked = S2N_NOT_BLOCKED;
     int max_payload_size;
@@ -148,6 +150,8 @@ static int handshake_write_io(struct s2n_connection *conn)
  */
 static int read_full_handshake_message(struct s2n_connection *conn, uint8_t *message_type)
 {
+    validate_recv_state(conn);
+
     uint32_t current_handshake_data = s2n_stuffer_data_available(&conn->handshake.io);
     if (current_handshake_data < TLS_HANDSHAKE_HEADER_LENGTH) {
         /* The message may be so badly fragmented that we don't even read the full header, take
@@ -208,6 +212,8 @@ static int handshake_read_io(struct s2n_connection *conn)
 {
     uint8_t record_type;
     int isSSLv2;
+
+    validate_recv_state(conn);
 
     int r = s2n_read_full_record(conn, &record_type, &isSSLv2);
     if (r < 0) {
