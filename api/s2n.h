@@ -32,6 +32,11 @@ extern __thread int s2n_errno;
 
 struct s2n_config;
 
+/* declarations for the functions we add */
+void assert(int);
+int validate_state(int, int);
+/* end declarations */
+
 extern int s2n_init(void);
 extern int s2n_cleanup(void);
 extern struct s2n_config *s2n_config_new(void);
