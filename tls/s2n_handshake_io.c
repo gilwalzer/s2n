@@ -131,7 +131,7 @@ static int handshake_write_io(struct s2n_connection *conn)
         GUARD(s2n_stuffer_wipe(&conn->out));
         GUARD(s2n_stuffer_wipe(&conn->handshake.io));
 
-        validate_state(conn->handshake.state, conn->handshake.next_state);
+        validate_transition(conn->handshake.state, conn->handshake.next_state);
 
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
@@ -241,7 +241,7 @@ static int handshake_read_io(struct s2n_connection *conn)
         GUARD(s2n_stuffer_wipe(&conn->in));
         conn->in_status = ENCRYPTED;
 
-        validate_state(conn->handshake.state, conn->handshake.next_state);
+        validate_transition(conn->handshake.state, conn->handshake.next_state);
 
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
@@ -267,7 +267,7 @@ static int handshake_read_io(struct s2n_connection *conn)
         conn->in_status = ENCRYPTED;
 
         // assert the state transition is valid
-        validate_state(conn->handshake.state, conn->handshake.next_state);
+        validate_transition(conn->handshake.state, conn->handshake.next_state);
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
 
@@ -316,7 +316,7 @@ static int handshake_read_io(struct s2n_connection *conn)
             return r;
         }
 
-        validate_state(conn->handshake.state, conn->handshake.next_state);
+        validate_transition(conn->handshake.state, conn->handshake.next_state);
 
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
