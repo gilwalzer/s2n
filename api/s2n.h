@@ -88,7 +88,7 @@ extern int s2n_connection_get_alert(struct s2n_connection *conn);
 
 /* declarations for the functions we add */
 void assert(int);
-int validate_state(int, int);
+void validate_transition(int, int);
 void validate_send_state(struct s2n_connection *);
 void validate_recv_state(struct s2n_connection *);
 /* end declarations */
