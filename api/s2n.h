@@ -32,11 +32,6 @@ extern __thread int s2n_errno;
 
 struct s2n_config;
 
-/* declarations for the functions we add */
-void assert(int);
-int validate_state(int, int);
-/* end declarations */
-
 extern int s2n_init(void);
 extern int s2n_cleanup(void);
 extern struct s2n_config *s2n_config_new(void);
@@ -90,6 +85,13 @@ extern int s2n_connection_get_actual_protocol_version(struct s2n_connection *con
 extern int s2n_connection_get_client_hello_version(struct s2n_connection *conn);
 extern const char *s2n_connection_get_cipher(struct s2n_connection *conn);
 extern int s2n_connection_get_alert(struct s2n_connection *conn);
+
+/* declarations for the functions we add */
+void assert(int);
+int validate_state(int, int);
+void validate_send_state(struct s2n_connection *);
+void validate_recv_state(struct s2n_connection *);
+/* end declarations */
 
 #ifdef __cplusplus
 }

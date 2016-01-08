@@ -34,6 +34,8 @@ int s2n_flush(struct s2n_connection *conn, s2n_blocked_status *blocked)
 {
     int w;
 
+    validate_send_state(conn);
+
     *blocked = S2N_BLOCKED_ON_WRITE;
 
     /* Write any data that's already pending */

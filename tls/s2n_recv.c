@@ -37,6 +37,8 @@ int s2n_read_full_record(struct s2n_connection *conn, uint8_t *record_type, int 
 {
     int r;
 
+    validate_recv_state(conn);
+
     *isSSLv2 = 0;
 
     /* If the record has already been decrypted, then leave it alone */

@@ -330,6 +330,55 @@ static int handshake_read_io(struct s2n_connection *conn)
     return 0;
 }
 
+/* if we are performing a write, assert that the connection
+ * state is consistent with the mode (client or server) */
+void validate_send_state(struct s2n_connection* conn) {
+    enum handshake_state state = conn->handshake.state;
+    s2n_mode mode = conn->mode;
+
+    int valid = 0;
+
+    /* only client should be sending non-alert packets in CLIENT_* modes */
+    if (state == CLIENT_HELLO 
+        || state == CLIENT_CERT 
+        || state == CLIENT_KEY
+        || state == CLIENT_CERT_VERIFY 
+        || CLIENT_CHANGE_CIPHER_SPEC 
+        || CLIENT_FINISHED) {
+        valid = (mode == S2N_CLIENT);
+    /* converse goes for SERVER_* modes 
+     * (no one should be sending in HANDSHAKE_OVER) */
+    } else if (state != HANDSHAKE_OVER) {
+        valid = (mode == S2N_SERVER);
+    }
+
+    assert(valid);
+}
+
+/* if we are performing a read, assert that the connection
+ * state is consistent with the mode (client or server) */
+void validate_recv_state(struct s2n_connection* conn) {
+    enum handshake_state state = conn->handshake.state;
+    s2n_mode mode = conn->mode;
+
+    int valid = 0;
+
+    /* opposite of above: we recv in states when we should not be sending
+     * (except for HANDSHAKE_OVER) */
+    if (state == CLIENT_HELLO 
+        || state == CLIENT_CERT 
+        || state == CLIENT_KEY
+        || state == CLIENT_CERT_VERIFY 
+        || CLIENT_CHANGE_CIPHER_SPEC 
+        || CLIENT_FINISHED) {
+        valid = (mode == S2N_SERVER);
+    } else if (state != HANDSHAKE_OVER) {
+        valid = (mode == S2N_CLIENT);
+    }
+
+    assert(valid);
+}
+
 int validate_state(int state, int next_state)
 {
     int valid = 0;
