@@ -131,6 +131,8 @@ static int handshake_write_io(struct s2n_connection *conn)
         GUARD(s2n_stuffer_wipe(&conn->out));
         GUARD(s2n_stuffer_wipe(&conn->handshake.io));
 
+        validate_state(conn->handshake.state, conn->handshake.next_state);
+
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
     }
@@ -239,6 +241,8 @@ static int handshake_read_io(struct s2n_connection *conn)
         GUARD(s2n_stuffer_wipe(&conn->in));
         conn->in_status = ENCRYPTED;
 
+        validate_state(conn->handshake.state, conn->handshake.next_state);
+
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
     }
@@ -262,6 +266,8 @@ static int handshake_read_io(struct s2n_connection *conn)
         GUARD(s2n_stuffer_wipe(&conn->in));
         conn->in_status = ENCRYPTED;
 
+        // assert the state transition is valid
+        validate_state(conn->handshake.state, conn->handshake.next_state);
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
 
@@ -310,6 +316,8 @@ static int handshake_read_io(struct s2n_connection *conn)
             return r;
         }
 
+        validate_state(conn->handshake.state, conn->handshake.next_state);
+
         /* Advance the state machine */
         conn->handshake.state = conn->handshake.next_state;
     }
@@ -320,6 +328,69 @@ static int handshake_read_io(struct s2n_connection *conn)
     conn->in_status = ENCRYPTED;
 
     return 0;
+}
+
+int validate_state(int state, int next_state)
+{
+    bool valid = false;
+
+    //ClientHello -> ServerHello
+    if ((state == CLIENT_HELLO) && (next_state == SERVER_HELLO))
+        valid = true;
+
+    // Server Hello -> Server Hello Done
+    if ((state == SERVER_HELLO) && (next_state == SERVER_CERT))
+        valid = true;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_KEY))
+        valid = true;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_CERT_REQ))
+        valid = true;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_HELLO_DONE))
+        valid = true;
+
+    // Server Cert -> Server Hello Done
+    if ((state == SERVER_CERT) && (next_state == SERVER_KEY))
+        valid = true;
+    if ((state == SERVER_CERT) && (next_state == SERVER_CERT_REQ))
+        valid = true;
+    if ((state == SERVER_CERT) && (next_state == SERVER_HELLO_DONE))
+        valid = true;
+
+    if ((state == SERVER_KEY) && (next_state == SERVER_CERT_REQ))
+        valid = true;
+    if ((state == SERVER_KEY) && (next_state == SERVER_HELLO_DONE))
+        valid = true;
+
+    if ((state == SERVER_HELLO_DONE) && (next_state == CLIENT_CERT))
+        valid = true;
+    if ((state == SERVER_HELLO_DONE) && (next_state == CLIENT_KEY))
+        valid = true;
+
+    if ((state == CLIENT_CERT) && (next_state == CLIENT_KEY))
+        valid = true;
+    
+    if ((state == CLIENT_KEY) && (next_state == CLIENT_CERT_VERIFY))
+        valid = true;
+    
+    if ((state == CLIENT_KEY) && (next_state == CLIENT_CHANGE_CIPHER_SPEC))
+        valid = true;
+    
+    if ((state == CLIENT_CERT_VERIFY) && (next_state == CLIENT_CHANGE_CIPHER_SPEC))
+        valid = true;
+    
+    if ((state == CLIENT_CHANGE_CIPHER_SPEC) && (next_state == CLIENT_FINISHED))
+        valid = true;
+    
+    if ((state == CLIENT_FINISHED) && (next_state == SERVER_CHANGE_CIPHER_SPEC))
+        valid = true;
+
+    if ((state == SERVER_CHANGE_CIPHER_SPEC) && (next_state == SERVER_FINISHED))
+        valid = true;
+
+    if ((state == SERVER_FINISHED) && (next_state == HANDSHAKE_OVER))
+        valid = true;
+
+    assert(valid);
 }
 
 int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
