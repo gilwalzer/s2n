@@ -380,6 +380,73 @@ void validate_recv_state(struct s2n_connection* conn) {
     assert(valid);
 }
 
+void validate_connection(struct s2n_connection* conn) {
+    enum handshake_state state = conn->handshake.state;
+    enum handshake_state next_state = conn->handshake.next_state;
+
+    s2n_mode mode = conn->mode;
+
+    int valid = 0;
+
+    //ClientHello -> ServerHello
+    if ((state == CLIENT_HELLO) && (next_state == SERVER_HELLO))
+        valid = 1;
+
+    // Server Hello -> Server Hello Done
+    if ((state == SERVER_HELLO) && (next_state == SERVER_CERT))
+        valid = 1;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_KEY))
+        valid = 1;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_CERT_REQ))
+        valid = 1;
+    if ((state == SERVER_HELLO) && (next_state == SERVER_HELLO_DONE))
+        valid = 1;
+
+    // Server Cert -> Server Hello Done
+    if ((state == SERVER_CERT) && (next_state == SERVER_KEY))
+        valid = 1;
+    if ((state == SERVER_CERT) && (next_state == SERVER_CERT_REQ))
+        valid = 1;
+    if ((state == SERVER_CERT) && (next_state == SERVER_HELLO_DONE))
+        valid = 1;
+
+    if ((state == SERVER_KEY) && (next_state == SERVER_CERT_REQ))
+        valid = 1;
+    if ((state == SERVER_KEY) && (next_state == SERVER_HELLO_DONE))
+        valid = 1;
+
+    if ((state == SERVER_HELLO_DONE) && (next_state == CLIENT_CERT))
+        valid = 1;
+    if ((state == SERVER_HELLO_DONE) && (next_state == CLIENT_KEY))
+        valid = 1;
+
+    if ((state == CLIENT_CERT) && (next_state == CLIENT_KEY))
+        valid = 1;
+    
+    if ((state == CLIENT_KEY) && (next_state == CLIENT_CERT_VERIFY))
+        valid = 1;
+    
+    if ((state == CLIENT_KEY) && (next_state == CLIENT_CHANGE_CIPHER_SPEC))
+        valid = 1;
+    
+    if ((state == CLIENT_CERT_VERIFY) && (next_state == CLIENT_CHANGE_CIPHER_SPEC))
+        valid = 1;
+    
+    if ((state == CLIENT_CHANGE_CIPHER_SPEC) && (next_state == CLIENT_FINISHED))
+        valid = 1;
+    
+    if ((state == CLIENT_FINISHED) && (next_state == SERVER_CHANGE_CIPHER_SPEC))
+        valid = 1;
+
+    if ((state == SERVER_CHANGE_CIPHER_SPEC) && (next_state == SERVER_FINISHED))
+        valid = 1;
+
+    if ((state == SERVER_FINISHED) && (next_state == HANDSHAKE_OVER))
+        valid = 1;
+
+    assert(valid);
+}
+
 void validate_transition(int state, int next_state)
 {
     int valid = 0;
