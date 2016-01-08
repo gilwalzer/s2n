@@ -330,7 +330,7 @@ static int handshake_read_io(struct s2n_connection *conn)
     return 0;
 }
 
-int validate_state(int state, int next_state)
+int validate_transition(int state, int next_state)
 {
     int valid = 0;
 
