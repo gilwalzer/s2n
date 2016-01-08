@@ -34,7 +34,7 @@ struct s2n_config;
 
 /* declarations for the functions we add */
 void assert(int);
-int validate_state(int, int);
+void validate_transition(int, int);
 /* end declarations */
 
 extern int s2n_init(void);
