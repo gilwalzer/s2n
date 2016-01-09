@@ -349,8 +349,8 @@ void validate_send_state(struct s2n_connection* conn) {
         || state == CLIENT_CERT 
         || state == CLIENT_KEY
         || state == CLIENT_CERT_VERIFY 
-        || CLIENT_CHANGE_CIPHER_SPEC 
-        || CLIENT_FINISHED) {
+        || state == CLIENT_CHANGE_CIPHER_SPEC 
+        || state == CLIENT_FINISHED) {
         valid = (mode == S2N_CLIENT);
     /* converse goes for SERVER_* modes 
      * (no one should be sending in HANDSHAKE_OVER) */
@@ -375,8 +375,8 @@ void validate_recv_state(struct s2n_connection* conn) {
         || state == CLIENT_CERT 
         || state == CLIENT_KEY
         || state == CLIENT_CERT_VERIFY 
-        || CLIENT_CHANGE_CIPHER_SPEC 
-        || CLIENT_FINISHED) {
+        || state == CLIENT_CHANGE_CIPHER_SPEC 
+        || state == CLIENT_FINISHED) {
         valid = (mode == S2N_SERVER);
     } else if (state != HANDSHAKE_OVER) {
         valid = (mode == S2N_CLIENT);
