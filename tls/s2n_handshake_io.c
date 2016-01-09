@@ -345,12 +345,12 @@ void validate_send_state(struct s2n_connection* conn) {
     int valid = 0;
 
     /* only client should be sending non-alert packets in CLIENT_* modes */
-    if (state == CLIENT_HELLO 
-        || state == CLIENT_CERT 
-        || state == CLIENT_KEY
-        || state == CLIENT_CERT_VERIFY 
-        || state == CLIENT_CHANGE_CIPHER_SPEC 
-        || state == CLIENT_FINISHED) {
+    if ((state == CLIENT_HELLO) 
+        || (state == CLIENT_CERT) 
+        || (state == CLIENT_KEY)
+        || (state == CLIENT_CERT_VERIFY) 
+        || (state == CLIENT_CHANGE_CIPHER_SPEC) 
+        || (state == CLIENT_FINISHED)) {
         valid = (mode == S2N_CLIENT);
     /* converse goes for SERVER_* modes 
      * (no one should be sending in HANDSHAKE_OVER) */
@@ -371,12 +371,12 @@ void validate_recv_state(struct s2n_connection* conn) {
 
     /* opposite of above: we recv in states when we should not be sending
      * (except for HANDSHAKE_OVER) */
-    if (state == CLIENT_HELLO 
-        || state == CLIENT_CERT 
-        || state == CLIENT_KEY
-        || state == CLIENT_CERT_VERIFY 
-        || state == CLIENT_CHANGE_CIPHER_SPEC 
-        || state == CLIENT_FINISHED) {
+    if ((state == CLIENT_HELLO) 
+        || (state == CLIENT_CERT) 
+        || (state == CLIENT_KEY)
+        || (state == CLIENT_CERT_VERIFY) 
+        || (state == CLIENT_CHANGE_CIPHER_SPEC)
+        || (state == CLIENT_FINISHED)) {
         valid = (mode == S2N_SERVER);
     } else if (state != HANDSHAKE_OVER) {
         valid = (mode == S2N_CLIENT);
@@ -460,11 +460,11 @@ int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
     // assume the connection struct is not null and connection is free to write;
     // in a new connection (as should be used in s2n_negotiate()), the initial state 
     // would be client hello
-    __CPROVER_assume(conn != NULL);
-    __CPROVER_assume(conn->mode == S2N_CLIENT || conn->mode == S2N_SERVER);
-    __CPROVER_assume(conn->handshake.state == CLIENT_HELLO);
-    __CPROVER_assume(blocked != NULL);
-    __CPROVER_assume(*blocked == S2N_NOT_BLOCKED);
+    //__CPROVER_assume(conn != NULL);
+    //__CPROVER_assume((conn->mode == S2N_CLIENT) || (conn->mode == S2N_SERVER));
+    //__CPROVER_assume(conn->handshake.state == CLIENT_HELLO);
+    //__CPROVER_assume(blocked != NULL);
+    //__CPROVER_assume(*blocked == S2N_NOT_BLOCKED);
 
     char this = 'S';
     if (conn->mode == S2N_CLIENT) {
@@ -498,4 +498,18 @@ int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
     *blocked = S2N_NOT_BLOCKED;
 
     return 0;
+}
+
+// tiny functions to ensure that the connection structs are being initialized
+
+int s2n_negotiate_client(void) {
+    struct s2n_connection* conn = s2n_connection_new(S2N_CLIENT);
+    s2n_blocked_status blocked = S2N_NOT_BLOCKED;
+    return s2n_negotiate(conn, &blocked);
+}
+
+int s2n_negotiate_server(void) {
+    struct s2n_connection* conn = s2n_connection_new(S2N_SERVER);
+    s2n_blocked_status blocked = S2N_NOT_BLOCKED;
+    return s2n_negotiate(conn, &blocked);
 }

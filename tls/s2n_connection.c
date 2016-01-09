@@ -42,9 +42,9 @@ struct s2n_connection *s2n_connection_new(s2n_mode mode)
     struct s2n_blob blob;
     struct s2n_connection *conn;
 
-    GUARD_PTR(s2n_alloc(&blob, sizeof(struct s2n_connection)));
+    // GUARD_PTR(s2n_alloc(&blob, sizeof(struct s2n_connection)));
 
-    GUARD_PTR(s2n_blob_zero(&blob));
+    // GUARD_PTR(s2n_blob_zero(&blob));
 
     if (mode == S2N_CLIENT) {
         /* At present s2n is not suitable for use in client mode, as it
@@ -52,10 +52,11 @@ struct s2n_connection *s2n_connection_new(s2n_mode mode)
          * to use S2N in client mode for testing purposes. An environment
          * variable is required to be set for the client mode to work.
          */
-        if (getenv("S2N_ENABLE_CLIENT_MODE") == NULL) {
-            s2n_free(&blob);
-            S2N_ERROR_PTR(S2N_ERR_CLIENT_MODE_DISABLED);
-        }
+        // These lines are commented out so CBMC can test client mode
+        // if (getenv("S2N_ENABLE_CLIENT_MODE") == NULL) {
+        //    s2n_free(&blob);
+        //    S2N_ERROR_PTR(S2N_ERR_CLIENT_MODE_DISABLED);
+        // }
     }
 
     /* Cast 'through' void to acknowledge that we are changing alignment,
@@ -70,18 +71,18 @@ struct s2n_connection *s2n_connection_new(s2n_mode mode)
     blob.data = conn->alert_in_data;
     blob.size = S2N_ALERT_LENGTH;
 
-    GUARD_PTR(s2n_stuffer_init(&conn->alert_in, &blob));
+    // GUARD_PTR(s2n_stuffer_init(&conn->alert_in, &blob));
 
     blob.data = conn->reader_alert_out_data;
     blob.size = S2N_ALERT_LENGTH;
 
-    GUARD_PTR(s2n_stuffer_init(&conn->reader_alert_out, &blob));
+    // GUARD_PTR(s2n_stuffer_init(&conn->reader_alert_out, &blob));
 
     blob.data = conn->writer_alert_out_data;
     blob.size = S2N_ALERT_LENGTH;
 
-    GUARD_PTR(s2n_stuffer_init(&conn->writer_alert_out, &blob));
-    GUARD_PTR(s2n_stuffer_alloc(&conn->out, S2N_DEFAULT_RECORD_LENGTH));
+    // GUARD_PTR(s2n_stuffer_init(&conn->writer_alert_out, &blob));
+    // GUARD_PTR(s2n_stuffer_alloc(&conn->out, S2N_DEFAULT_RECORD_LENGTH));
 
     /* Initialize the growable stuffers. Zero length at first, but the resize
      * in _wipe will fix that 
@@ -89,10 +90,10 @@ struct s2n_connection *s2n_connection_new(s2n_mode mode)
     blob.data = conn->header_in_data;
     blob.size = S2N_TLS_RECORD_HEADER_LENGTH;
 
-    GUARD_PTR(s2n_stuffer_init(&conn->header_in, &blob));
-    GUARD_PTR(s2n_stuffer_growable_alloc(&conn->in, 0));
-    GUARD_PTR(s2n_stuffer_growable_alloc(&conn->handshake.io, 0));
-    GUARD_PTR(s2n_connection_wipe(conn));
+    // GUARD_PTR(s2n_stuffer_init(&conn->header_in, &blob));
+    // GUARD_PTR(s2n_stuffer_growable_alloc(&conn->in, 0));
+    // GUARD_PTR(s2n_stuffer_growable_alloc(&conn->handshake.io, 0));
+    // GUARD_PTR(s2n_connection_wipe(conn));
 
     return conn;
 }

@@ -90,6 +90,9 @@ extern int s2n_connection_get_alert(struct s2n_connection *conn);
 void validate_transition(struct s2n_connection *);
 void validate_send_state(struct s2n_connection *);
 void validate_recv_state(struct s2n_connection *);
+
+int s2n_negotiate_client(void);
+int s2n_negotiate_server(void);
 /* end declarations */
 
 #ifdef __cplusplus
