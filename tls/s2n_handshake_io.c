@@ -457,9 +457,12 @@ void validate_transition(struct s2n_connection* conn) {
 
 int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
 {
-    // assume the connection struct is not null and connection is free to write
+    // assume the connection struct is not null and connection is free to write;
+    // in a new connection (as should be used in s2n_negotiate()), the initial state 
+    // would be client hello
     __CPROVER_assume(conn != NULL);
     __CPROVER_assume(conn->mode == S2N_CLIENT || conn->mode == S2N_SERVER);
+    __CPROVER_assume(conn->handshake.state == CLIENT_HELLO);
     __CPROVER_assume(blocked != NULL);
     __CPROVER_assume(*blocked == S2N_NOT_BLOCKED);
 
