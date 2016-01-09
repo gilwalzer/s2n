@@ -503,13 +503,15 @@ int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
 // tiny functions to ensure that the connection structs are being initialized
 
 int s2n_negotiate_client(void) {
-    struct s2n_connection* conn = s2n_connection_new(S2N_CLIENT);
+    struct s2n_connection conn;
+    conn.mode = S2N_CLIENT;
     s2n_blocked_status blocked = S2N_NOT_BLOCKED;
-    return s2n_negotiate(conn, &blocked);
+    return s2n_negotiate(&conn, &blocked);
 }
 
 int s2n_negotiate_server(void) {
-    struct s2n_connection* conn = s2n_connection_new(S2N_SERVER);
+    struct s2n_connection conn;
+    conn.mode = S2N_SERVER;
     s2n_blocked_status blocked = S2N_NOT_BLOCKED;
-    return s2n_negotiate(conn, &blocked);
+    return s2n_negotiate(&conn, &blocked);
 }
