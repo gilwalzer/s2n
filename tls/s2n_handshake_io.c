@@ -358,7 +358,7 @@ void validate_send_state(struct s2n_connection* conn) {
         valid = (mode == S2N_SERVER);
     }
 
-    assert(valid);
+    __CPROVER_assert(valid, "Sending packet in mode when non-alert should not be sent");
 }
 
 /* if we are performing a read, assert that the connection
@@ -382,7 +382,7 @@ void validate_recv_state(struct s2n_connection* conn) {
         valid = (mode == S2N_CLIENT);
     }
 
-    assert(valid);
+    __CPROVER_assert(valid, "Receiving non-alert packet in state that should not be receiving");
 }
 
 void validate_transition(struct s2n_connection* conn) {
@@ -449,15 +449,25 @@ void validate_transition(struct s2n_connection* conn) {
     if ((state == SERVER_FINISHED) && (next_state == HANDSHAKE_OVER))
         valid = 1;
 
-    assert(valid);
+    if (state == HANDSHAKE_OVER)
+        valid = 1;
+
+    __CPROVER_assert(valid, "Proceeding to state out of sequence");
 }
 
 int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
 {
+    // assume the connection struct is not null and connection is free to write
+    __CPROVER_assume(conn != NULL);
+    __CPROVER_assume(conn->mode == S2N_CLIENT || conn->mode == S2N_SERVER);
+    __CPROVER_assume(blocked != NULL);
+    __CPROVER_assume(*blocked == S2N_NOT_BLOCKED);
+
     char this = 'S';
     if (conn->mode == S2N_CLIENT) {
         this = 'C';
     }
+
 
     while (state_machine[conn->handshake.state].writer != 'B') {
 
@@ -466,9 +476,13 @@ int s2n_negotiate(struct s2n_connection *conn, s2n_blocked_status *blocked)
 
         if (state_machine[conn->handshake.state].writer == this) {
             *blocked = S2N_BLOCKED_ON_WRITE;
+            // assume that we will not have any alerts coming out
+            __CPROVER_assume(s2n_stuffer_data_available(&conn->reader_alert_out) == 0);
             GUARD(handshake_write_io(conn));
         } else {
             *blocked = S2N_BLOCKED_ON_READ;
+            // assume that we will not have any alerts
+            __CPROVER_assume(s2n_stuffer_data_available(&conn->alert_in) == 0);
             GUARD(handshake_read_io(conn));
         }
 

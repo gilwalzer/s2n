@@ -87,7 +87,6 @@ extern const char *s2n_connection_get_cipher(struct s2n_connection *conn);
 extern int s2n_connection_get_alert(struct s2n_connection *conn);
 
 /* declarations for the functions we add */
-void assert(int);
 void validate_transition(struct s2n_connection *);
 void validate_send_state(struct s2n_connection *);
 void validate_recv_state(struct s2n_connection *);
